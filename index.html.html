@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gameway Audit</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { background: #0a0c14; color: #e2e8f0; font-family: 'DM Sans', sans-serif; font-size: 15px; }
+
+/* ── VIEWS ── */
+.view { display: none; min-height: 100vh; padding-bottom: 110px; }
+.view.active { display: block; }
+
+/* ── TOP BAR ── */
+.topbar {
+  background: #111520;
+  border-bottom: 1px solid #1e2540;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.topbar-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #00e5ff;
+  flex: 1;
+}
+.topbar-sub { font-size: 12px; color: #64748b; }
+.icon-btn {
+  background: #181d2e;
+  border: 1px solid #1e2540;
+  border-radius: 8px;
+  color: #e2e8f0;
+  font-size: 18px;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+}
+.icon-btn:active { opacity: 0.7; }
+
+/* ── HOME / PAST AUDITS ── */
+.home-hero {
+  padding: 24px 16px 16px;
+  text-align: center;
+}
+.home-logo {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #00e5ff;
+  margin-bottom: 4px;
+}
+.home-logo span { color: #e2e8f0; }
+.home-sub { font-size: 13px; color: #64748b; margin-bottom: 24px; }
+
+.new-audit-btn {
+  width: calc(100% - 32px);
+  margin: 0 16px 20px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #00e5ff;
+  border: none;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #000;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+.new-audit-btn:active { opacity: 0.85; }
+
+.section-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #64748b;
+  padding: 0 16px 8px;
+}
+
+.audit-card {
+  background: #111520;
+  border: 1px solid #1e2540;
+  border-radius: 10px;
+  margin: 0 12px 8px;
+  padding: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.audit-card:active { opacity: 0.8; }
+.audit-card-score {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  min-width: 48px;
+  text-align: center;
+}
+.audit-card-info { flex: 1; }
+.audit-card-loc { font-weight: 500; font-size: 14px; }
+.audit-card-meta { font-size: 12px; color: #64748b; margin-top: 2px; }
+.audit-card-arrow { color: #64748b; font-size: 16px; }
+.audit-card-del {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 18px;
+  padding: 4px 8px;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+.audit-card-del:active { color: #ef4444; }
+
+.empty-state {
+  text-align: center;
+  padding: 40px 32px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+/* ── AUDIT FORM ── */
+.info-row { display: flex; gap: 8px; padding: 12px 16px; }
+input[type=text] {
+  flex: 1;
+  background: #181d2e;
+  border: 1px solid #1e2540;
+  border-radius: 8px;
+  color: #e2e8f0;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  padding: 9px 11px;
+  outline: none;
+  width: 100%;
+}
+input[type=text]::placeholder { color: #64748b; }
+input[type=text]:focus { border-color: #00e5ff; }
+
+.score-strip {
+  background: #111520;
+  border-top: 1px solid #1e2540;
+  border-bottom: 1px solid #1e2540;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.big-score { font-family: 'Rajdhani', sans-serif; font-size: 40px; font-weight: 700; line-height: 1; color: #64748b; min-width: 56px; }
+.score-right { flex: 1; }
+.score-right-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+.prog-track { background: #1e2540; border-radius: 4px; height: 7px; }
+.prog-fill { height: 7px; border-radius: 4px; background: #00e5ff; width: 0%; }
+.items-count { font-size: 11px; color: #64748b; margin-top: 3px; }
+
+.legend { display: flex; justify-content: space-around; padding: 6px 16px 10px; border-bottom: 1px solid #1e2540; margin-bottom: 8px; }
+.leg { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #64748b; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+.section { padding: 0 12px; margin-bottom: 4px; }
+.sec-header {
+  background: #181d2e;
+  border: 1px solid #1e2540;
+  border-left: 3px solid #00e5ff;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+.sec-icon { font-size: 20px; }
+.sec-title { font-family: 'Rajdhani', sans-serif; font-size: 17px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; flex: 1; }
+.sec-avg { font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 700; color: #64748b; }
+.sec-toggle { font-size: 14px; color: #64748b; margin-left: 6px; }
+.sec-items { margin-bottom: 10px; }
+
+.card { background: #111520; border: 1px solid #1e2540; border-radius: 10px; margin-bottom: 8px; overflow: hidden; }
+.card.scored { border-left: 3px solid #00e5ff; }
+.card-top { padding: 11px 13px 6px; }
+.card-name { font-weight: 500; font-size: 14px; line-height: 1.3; margin-bottom: 2px; }
+.card-desc { font-size: 12px; color: #64748b; line-height: 1.4; }
+
+.score-row { display: flex; gap: 5px; padding: 6px 13px; align-items: center; }
+.score-lbl { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; margin-right: 2px; }
+.score-btns { display: flex; gap: 5px; flex: 1; }
+.sbtn {
+  flex: 1; height: 36px; border-radius: 7px; border: 1px solid #1e2540;
+  background: #0a0c14; color: #64748b;
+  font-family: 'Rajdhani', sans-serif; font-size: 17px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  -webkit-appearance: none; appearance: none;
+}
+.sbtn:active { opacity: 0.7; }
+.sbtn.a1 { background:#ef4444;border-color:#ef4444;color:#fff; }
+.sbtn.a2 { background:#f97316;border-color:#f97316;color:#fff; }
+.sbtn.a3 { background:#f59e0b;border-color:#f59e0b;color:#000; }
+.sbtn.a4 { background:#84cc16;border-color:#84cc16;color:#000; }
+.sbtn.a5 { background:#10b981;border-color:#10b981;color:#fff; }
+
+.note-area { padding: 4px 13px 11px; }
+textarea {
+  width: 100%; background: #181d2e; border: 1px solid #1e2540; border-radius: 8px;
+  color: #e2e8f0; font-family: 'DM Sans', sans-serif; font-size: 13px;
+  padding: 8px 10px; resize: none; height: 58px; outline: none; -webkit-appearance: none;
+}
+textarea::placeholder { color: #64748b; }
+textarea:focus { border-color: #00e5ff; }
+
+/* ── BOTTOM BAR ── */
+.bottom-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #181d2e; border-top: 1px solid #1e2540;
+  padding: 10px 16px; display: flex; gap: 8px; z-index: 99;
+}
+.btn {
+  flex: 1; padding: 13px; border-radius: 10px; border: none;
+  font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer; -webkit-appearance: none;
+}
+.btn-primary { background: #00e5ff; color: #000; }
+.btn-secondary { background: #111520; border: 1px solid #1e2540; color: #e2e8f0; }
+.btn-save { background: #7c3aed; color: #fff; }
+.btn:active { opacity: 0.8; }
+
+/* ── MODAL ── */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 200; align-items: flex-end; }
+.overlay.show { display: flex; }
+.modal {
+  background: #181d2e; border-radius: 16px 16px 0 0; border-top: 1px solid #1e2540;
+  width: 100%; max-height: 90vh; overflow-y: auto; padding: 20px 16px 40px;
+  -webkit-overflow-scrolling: touch;
+}
+.modal-title { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #00e5ff; margin-bottom: 4px; }
+.modal-sub { font-size: 12px; color: #64748b; margin-bottom: 16px; }
+
+/* SHAREABLE SUMMARY */
+.share-box {
+  background: #0a0c14;
+  border: 1px solid #1e2540;
+  border-radius: 10px;
+  padding: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #e2e8f0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: 12px;
+  max-height: 320px;
+  overflow-y: auto;
+  -webkit-user-select: all;
+  user-select: all;
+}
+
+.modal-btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.modal-btn {
+  flex: 1; padding: 12px; border-radius: 10px; border: none;
+  font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer; -webkit-appearance: none;
+}
+.modal-btn-primary { background: #00e5ff; color: #000; }
+.modal-btn-secondary { background: #111520; border: 1px solid #1e2540; color: #e2e8f0; }
+.modal-btn-purple { background: #7c3aed; color: #fff; }
+.modal-btn:active { opacity: 0.8; }
+
+.sum-sec { margin-bottom: 14px; }
+.sum-sec-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #1e2540; }
+.sum-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid #1e2540; font-size: 13px; gap: 10px; }
+.sum-score { font-family: 'Rajdhani', sans-serif; font-size: 19px; font-weight: 700; flex-shrink: 0; }
+.sum-note { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+.copy-hint { font-size: 11px; color: #64748b; text-align: center; margin-bottom: 12px; }
+.copied-toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+  background: #10b981; color: #fff; padding: 8px 20px; border-radius: 20px;
+  font-size: 13px; font-weight: 500; z-index: 999;
+  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+}
+.copied-toast.show { opacity: 1; }
+
+/* ── DETAIL VIEW ── */
+.detail-sec { margin-bottom: 14px; padding: 0 12px; }
+.detail-sec-title {
+  font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; color: #64748b;
+  padding: 8px 0; border-bottom: 1px solid #1e2540; margin-bottom: 8px;
+  display: flex; justify-content: space-between;
+}
+.detail-item { padding: 8px 0; border-bottom: 1px solid #1e2540; }
+.detail-item-row { display: flex; justify-content: space-between; align-items: center; }
+.detail-item-name { font-size: 13px; }
+.detail-item-score { font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; }
+.detail-note { font-size: 11px; color: #94a3b8; margin-top: 3px; }
+
+.flag-banner {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin: 0 12px 12px;
+}
+.flag-banner-title { font-size: 12px; color: #ef4444; font-weight: 500; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.flag-item { font-size: 13px; padding: 4px 0; border-bottom: 1px solid rgba(239,68,68,0.15); display: flex; justify-content: space-between; }
+
+/* ── COLORS ── */
+.s0{color:#64748b;} .s1{color:#ef4444;} .s2{color:#f97316;} .s3{color:#f59e0b;} .s4{color:#84cc16;} .s5{color:#10b981;}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="copied-toast" id="toast">Copied to clipboard!</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- VIEW: HOME                              -->
+<!-- ════════════════════════════════════════ -->
+<div class="view active" id="view-home">
+  <div class="home-hero">
+    <div class="home-logo">Game<span>way</span></div>
+    <div class="home-sub">Location Audit Tool</div>
+  </div>
+
+  <button class="new-audit-btn" onclick="startNewAudit()">+ Start New Audit</button>
+
+  <div class="section-label">Past Audits</div>
+  <div id="pastAuditsList">
+    <div class="empty-state">
+      <div class="empty-icon">📋</div>
+      No saved audits yet.<br>Complete and save an audit to see it here.
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- VIEW: AUDIT FORM                        -->
+<!-- ════════════════════════════════════════ -->
+<div class="view" id="view-audit">
+  <div class="topbar">
+    <button class="icon-btn" onclick="goHome()">←</button>
+    <span class="topbar-title">GAMEWAY AUDIT</span>
+    <span class="topbar-sub" id="auditDateLabel"></span>
+  </div>
+
+  <div class="info-row">
+    <input type="text" id="auditorName" placeholder="Auditor name" />
+    <input type="text" id="locationName" placeholder="Airport / Location" />
+  </div>
+
+  <div class="score-strip">
+    <div class="big-score s0" id="overallScore">—</div>
+    <div class="score-right">
+      <div class="score-right-label">Overall Score / 5.0</div>
+      <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+      <div class="items-count" id="itemsCount">0 of 0 items rated</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><div class="dot" style="background:#ef4444"></div>1 Critical</div>
+    <div class="leg"><div class="dot" style="background:#f97316"></div>2 Poor</div>
+    <div class="leg"><div class="dot" style="background:#f59e0b"></div>3 Fair</div>
+    <div class="leg"><div class="dot" style="background:#84cc16"></div>4 Good</div>
+    <div class="leg"><div class="dot" style="background:#10b981"></div>5 Excellent</div>
+  </div>
+
+  <div id="auditContent"></div>
+
+  <div class="bottom-bar">
+    <button class="btn btn-secondary" onclick="openSummaryModal()">Preview</button>
+    <button class="btn btn-save" onclick="saveAndShare()">Save & Share</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- VIEW: PAST AUDIT DETAIL                 -->
+<!-- ════════════════════════════════════════ -->
+<div class="view" id="view-detail">
+  <div class="topbar">
+    <button class="icon-btn" onclick="showView('home')">←</button>
+    <span class="topbar-title" id="detailTitle">Audit Detail</span>
+  </div>
+  <div id="detailContent" style="padding-top:8px;"></div>
+  <div class="bottom-bar">
+    <button class="btn btn-secondary" onclick="showView('home')">Back</button>
+    <button class="btn btn-primary" onclick="shareDetailText()">Share / Copy</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- MODAL: SUMMARY / SHARE                  -->
+<!-- ════════════════════════════════════════ -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Audit Summary</div>
+    <div class="modal-sub" id="modalSub"></div>
+    <div id="modalContent"></div>
+    <button class="modal-btn modal-btn-secondary" style="width:100%;margin-top:12px" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────
+var SECTIONS = [
+  { id:'clean', icon:'🧹', title:'Cleanliness', items:[
+    {id:'c1',name:'Entrance & Threshold',desc:'Entry swept, free of debris, mats clean'},
+    {id:'c2',name:'Floor Condition',desc:'Floors vacuumed/mopped, no sticky spots or spills'},
+    {id:'c3',name:'Walls & Surfaces',desc:'Fingerprints, scuffs, and marks removed'},
+    {id:'c4',name:'Trash & Waste Bins',desc:'Bins emptied, liners replaced, no overflow'},
+    {id:'c5',name:'Seating & Chairs',desc:'Clean, no food residue, stains, or damage'},
+    {id:'c6',name:'Counters & Desk Area',desc:'Staff counter wiped and clutter-free'},
+    {id:'c7',name:'Windows & Partitions',desc:'Smudge-free, clear sightlines into lounge'},
+    {id:'c8',name:'Overall Odor',desc:'Lounge smells fresh, no food or musty odors'}
+  ]},
+  { id:'stock', icon:'📦', title:'Stocking & Supplies', items:[
+    {id:'s1',name:'Controller Inventory',desc:'Correct number of controllers present and accounted for'},
+    {id:'s2',name:'Headset Inventory',desc:'All headsets present, cables intact'},
+    {id:'s3',name:'Charging Cables & Adapters',desc:'Cables present, undamaged, and functional'},
+    {id:'s4',name:'Sanitizing Supplies',desc:'Wipes/spray/towels stocked and accessible'},
+    {id:'s5',name:'Printed Materials / Signage',desc:'Menus, instructions, or signage properly displayed'},
+    {id:'s6',name:'POS / Payment Supplies',desc:'Receipt paper, card reader working'},
+    {id:'s7',name:'Staff Supplies Ready',desc:'Forms, radios, or tools on hand'}
+  ]},
+  { id:'gaming', icon:'🎮', title:'Gaming Stations', items:[
+    {id:'g1',name:'Console Power & Boot',desc:'All consoles/PCs power on correctly, no error screens'},
+    {id:'g2',name:'Approved Game Library',desc:'Only approved titles installed — no unauthorized games'},
+    {id:'g3',name:'Game Content Ratings',desc:'All titles meet age-rating policy for the lounge'},
+    {id:'g4',name:'Display / Monitor Condition',desc:'Screens clean, no dead pixels, brightness correct'},
+    {id:'g5',name:'Controller Functionality',desc:'Buttons, triggers, sticks responsive — no sticky inputs'},
+    {id:'g6',name:'Headset Audio Quality',desc:'Audio clear, mic functional, no buzzing or dropouts'},
+    {id:'g7',name:'Station Cleanliness',desc:'Each station wiped — controllers, headsets, surfaces'},
+    {id:'g8',name:'Cable Management',desc:'Cables tidy, not a trip hazard, no fraying'},
+    {id:'g9',name:'Volume Levels',desc:'Audio at appropriate level, not disturbing other passengers'},
+    {id:'g10',name:'Session Timer / Booking System',desc:'Timers accurate, booking system synced'}
+  ]},
+  { id:'wrangle', icon:'🔄', title:'Wrangling Process', items:[
+    {id:'w1',name:'Turnover Speed',desc:'Stations reset promptly when a session ends'},
+    {id:'w2',name:'Equipment Sanitization at Turnover',desc:'Controllers & headsets wiped between every guest'},
+    {id:'w3',name:'Guest Check-In Process',desc:'ID/boarding pass checked if required; guest briefed'},
+    {id:'w4',name:'Waitlist Management',desc:'Queue handled fairly, guests updated on wait time'},
+    {id:'w5',name:'Session Time Enforcement',desc:'Staff actively monitors and ends sessions on time'},
+    {id:'w6',name:'Equipment Return Check',desc:'Staff verifies all equipment returned after session'},
+    {id:'w7',name:'Guest Conduct Monitoring',desc:'Loud or disruptive behavior addressed appropriately'},
+    {id:'w8',name:'Staff Attentiveness',desc:'Staff visible, engaged, not on personal phone'},
+    {id:'w9',name:'Incident / Issue Handling',desc:'Broken equipment or disputes handled per SOP'}
+  ]}
+];
+
+var scores = {};
+var notesData = {};
+var currentAuditDate = '';
+var savedAudits = [];
+var viewingAuditIndex = -1;
+
+// ── STORAGE ───────────────────────────────
+function loadSaved() {
+  try {
+    var raw = localStorage.getItem('gameway_audits');
+    savedAudits = raw ? JSON.parse(raw) : [];
+  } catch(e) { savedAudits = []; }
+}
+
+function persistSaved() {
+  try { localStorage.setItem('gameway_audits', JSON.stringify(savedAudits)); } catch(e) {}
+}
+
+// ── NAVIGATION ────────────────────────────
+function showView(name) {
+  document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+  document.getElementById('view-' + name).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function goHome() {
+  if (confirm('Leave audit? Unsaved scores will be lost.')) {
+    showView('home');
+    renderPastAudits();
+  }
+}
+
+// ── HOME ──────────────────────────────────
+function renderPastAudits() {
+  loadSaved();
+  var el = document.getElementById('pastAuditsList');
+  if (!savedAudits.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div>No saved audits yet.<br>Complete and save an audit to see it here.</div>';
+    return;
+  }
+  var html = '';
+  for (var i = savedAudits.length - 1; i >= 0; i--) {
+    var a = savedAudits[i];
+    var idx = i;
+    var scoreClass = a.avg ? 's' + Math.round(a.avg) : 's0';
+    var scoreText = a.avg ? a.avg.toFixed(1) : '—';
+    html += '<div class="audit-card" onclick="viewAudit(' + idx + ')">' +
+      '<div class="audit-card-score ' + scoreClass + '">' + scoreText + '</div>' +
+      '<div class="audit-card-info">' +
+        '<div class="audit-card-loc">' + (a.location || 'Unknown Location') + '</div>' +
+        '<div class="audit-card-meta">' + (a.auditor || 'Unknown') + ' · ' + a.date + '</div>' +
+        '<div class="audit-card-meta">' + a.rated + ' of ' + a.total + ' items rated</div>' +
+      '</div>' +
+      '<button class="audit-card-del" onclick="deleteAudit(event,' + idx + ')">🗑</button>' +
+    '</div>';
+  }
+  el.innerHTML = html;
+}
+
+function startNewAudit() {
+  scores = {};
+  notesData = {};
+  currentAuditDate = new Date().toLocaleString();
+  document.getElementById('auditorName').value = '';
+  document.getElementById('locationName').value = '';
+  document.getElementById('auditDateLabel').textContent = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  buildAuditUI();
+  updateOverall();
+  showView('audit');
+}
+
+function deleteAudit(e, idx) {
+  e.stopPropagation();
+  if (confirm('Delete this audit?')) {
+    savedAudits.splice(idx, 1);
+    persistSaved();
+    renderPastAudits();
+  }
+}
+
+// ── AUDIT FORM ────────────────────────────
+function buildAuditUI() {
+  var content = document.getElementById('auditContent');
+  content.innerHTML = '';
+
+  for (var si = 0; si < SECTIONS.length; si++) {
+    var sec = SECTIONS[si];
+    var secDiv = document.createElement('div');
+    secDiv.className = 'section';
+    secDiv.id = 'sec-' + sec.id;
+
+    var header = document.createElement('div');
+    header.className = 'sec-header';
+    header.innerHTML = '<span class="sec-icon">' + sec.icon + '</span>' +
+      '<span class="sec-title">' + sec.title + '</span>' +
+      '<span class="sec-avg s0" id="avg-' + sec.id + '">—</span>' +
+      '<span class="sec-toggle" id="tog-' + sec.id + '">▲</span>';
+
+    (function(secId) {
+      header.onclick = function() {
+        var tog = document.getElementById('tog-' + secId);
+        var it = document.getElementById('items-' + secId);
+        if (it.style.display === 'none') { it.style.display = 'block'; tog.textContent = '▲'; }
+        else { it.style.display = 'none'; tog.textContent = '▼'; }
+      };
+    })(sec.id);
+
+    var itemsDiv = document.createElement('div');
+    itemsDiv.className = 'sec-items';
+    itemsDiv.id = 'items-' + sec.id;
+
+    for (var ii = 0; ii < sec.items.length; ii++) {
+      var item = sec.items[ii];
+      var card = document.createElement('div');
+      card.className = 'card';
+      card.id = 'card-' + item.id;
+      var btnHtml = '';
+      for (var n = 1; n <= 5; n++) {
+        btnHtml += '<button class="sbtn" id="btn-'+item.id+'-'+n+'" data-item="'+item.id+'" data-score="'+n+'" data-sec="'+sec.id+'">'+n+'</button>';
+      }
+      card.innerHTML = '<div class="card-top"><div class="card-name">'+item.name+'</div><div class="card-desc">'+item.desc+'</div></div>' +
+        '<div class="score-row"><span class="score-lbl">Score</span><div class="score-btns">'+btnHtml+'</div></div>' +
+        '<div class="note-area"><textarea id="note-'+item.id+'" data-item="'+item.id+'" placeholder="Notes..."></textarea></div>';
+      itemsDiv.appendChild(card);
+    }
+
+    secDiv.appendChild(header);
+    secDiv.appendChild(itemsDiv);
+    content.appendChild(secDiv);
+  }
+
+  content.addEventListener('click', function(e) {
+    var btn = e.target.closest('.sbtn');
+    if (btn) setScore(btn.getAttribute('data-item'), parseInt(btn.getAttribute('data-score')), btn.getAttribute('data-sec'));
+  });
+  content.addEventListener('input', function(e) {
+    if (e.target.tagName === 'TEXTAREA') {
+      var id = e.target.getAttribute('data-item');
+      if (id) notesData[id] = e.target.value;
+    }
+  });
+}
+
+function setScore(itemId, score, secId) {
+  scores[itemId] = score;
+  for (var n = 1; n <= 5; n++) {
+    var btn = document.getElementById('btn-'+itemId+'-'+n);
+    if (btn) btn.className = 'sbtn' + (n === score ? ' a'+n : '');
+  }
+  var card = document.getElementById('card-'+itemId);
+  if (card) card.classList.add('scored');
+  updateSecAvg(secId);
+  updateOverall();
+}
+
+function getSecById(id) {
+  for (var i=0;i<SECTIONS.length;i++) if(SECTIONS[i].id===id) return SECTIONS[i];
+  return null;
+}
+
+function updateSecAvg(secId) {
+  var sec = getSecById(secId);
+  if (!sec) return;
+  var total=0,count=0;
+  for (var i=0;i<sec.items.length;i++) if(scores[sec.items[i].id]){total+=scores[sec.items[i].id];count++;}
+  var el = document.getElementById('avg-'+secId);
+  if (!el) return;
+  if (count) { var avg=total/count; el.textContent=avg.toFixed(1); el.className='sec-avg s'+Math.round(avg); }
+  else { el.textContent='—'; el.className='sec-avg s0'; }
+}
+
+function calcOverall() {
+  var total=0,count=0,allCount=0;
+  for (var si=0;si<SECTIONS.length;si++) {
+    for (var ii=0;ii<SECTIONS[si].items.length;ii++) {
+      allCount++;
+      var id=SECTIONS[si].items[ii].id;
+      if(scores[id]){total+=scores[id];count++;}
+    }
+  }
+  return {avg: count ? total/count : null, rated: count, total: allCount};
+}
+
+function updateOverall() {
+  var r = calcOverall();
+  var scoreEl=document.getElementById('overallScore');
+  var fillEl=document.getElementById('progFill');
+  var countEl=document.getElementById('itemsCount');
+  if (r.avg) {
+    scoreEl.textContent=r.avg.toFixed(1);
+    scoreEl.className='big-score s'+Math.round(r.avg);
+    fillEl.style.width=(r.avg/5*100)+'%';
+    fillEl.style.background=r.avg<2.5?'#ef4444':r.avg<3.5?'#f59e0b':'#10b981';
+  } else {
+    scoreEl.textContent='—'; scoreEl.className='big-score s0'; fillEl.style.width='0%';
+  }
+  countEl.textContent=r.rated+' of '+r.total+' items rated';
+}
+
+// ── BUILD TEXT REPORT ─────────────────────
+function buildTextReport(auditData) {
+  // auditData can be live form data or a saved object
+  var scr = auditData.scores || scores;
+  var nts = auditData.notes || notesData;
+  var loc = auditData.location || document.getElementById('locationName').value || 'Not specified';
+  var aud = auditData.auditor || document.getElementById('auditorName').value || 'Not specified';
+  var dt  = auditData.date || currentAuditDate;
+  var avgVal = auditData.avg;
+  if (avgVal === undefined) avgVal = calcOverall().avg;
+
+  var lines = [];
+  lines.push('╔══════════════════════════════╗');
+  lines.push('    GAMEWAY LOCATION AUDIT');
+  lines.push('╚══════════════════════════════╝');
+  lines.push('Location : ' + loc);
+  lines.push('Auditor  : ' + aud);
+  lines.push('Date     : ' + dt);
+  lines.push('Overall  : ' + (avgVal ? avgVal.toFixed(2) + ' / 5.00' : 'Incomplete'));
+  lines.push('');
+
+  var flags = [];
+  for (var si=0;si<SECTIONS.length;si++) {
+    var sec = SECTIONS[si];
+    var secTotal=0,secCount=0;
+    for (var ii=0;ii<sec.items.length;ii++) {
+      if(scr[sec.items[ii].id]){secTotal+=scr[sec.items[ii].id];secCount++;}
+    }
+    var secAvg = secCount ? (secTotal/secCount).toFixed(1) : '—';
+    lines.push('──────────────────────────────');
+    lines.push(sec.icon + ' ' + sec.title.toUpperCase() + '  [Avg: ' + secAvg + ']');
+    lines.push('');
+    for (var ii=0;ii<sec.items.length;ii++) {
+      var item = sec.items[ii];
+      var s = scr[item.id];
+      var n = nts[item.id];
+      var scoreLabel = s ? s+'/5' : '—';
+      var flag = s && s<=2 ? ' ⚠️' : '';
+      lines.push('  ' + item.name + flag);
+      lines.push('  Score: ' + scoreLabel);
+      if (n) lines.push('  Note : ' + n);
+      lines.push('');
+      if (s && s<=2) flags.push({name:item.name, score:s, note:n});
+    }
+  }
+
+  if (flags.length) {
+    lines.push('══════════════════════════════');
+    lines.push('⚠️  NEEDS IMMEDIATE ATTENTION');
+    lines.push('══════════════════════════════');
+    for (var f=0;f<flags.length;f++) {
+      lines.push('• ' + flags[f].name + ' ['+flags[f].score+'/5]');
+      if (flags[f].note) lines.push('  ' + flags[f].note);
+    }
+    lines.push('');
+  }
+
+  lines.push('══════════════════════════════');
+  lines.push('Generated by Gameway Audit Tool');
+  return lines.join('\n');
+}
+
+// ── SAVE & SHARE ──────────────────────────
+function saveAndShare() {
+  var r = calcOverall();
+  var loc = document.getElementById('locationName').value || 'Unknown Location';
+  var aud = document.getElementById('auditorName').value || 'Unknown';
+
+  var auditRecord = {
+    id: Date.now(),
+    date: currentAuditDate,
+    location: loc,
+    auditor: aud,
+    avg: r.avg,
+    rated: r.rated,
+    total: r.total,
+    scores: JSON.parse(JSON.stringify(scores)),
+    notes: JSON.parse(JSON.stringify(notesData))
+  };
+
+  loadSaved();
+  savedAudits.push(auditRecord);
+  persistSaved();
+
+  // Show share modal
+  var text = buildTextReport(auditRecord);
+  var html = '<p class="copy-hint">Tap the text below to select all, then copy — or use the buttons below.</p>' +
+    '<div class="share-box" id="shareBox" onclick="selectShareBox()">' + escHtml(text) + '</div>' +
+    '<div class="modal-btn-row">' +
+    '<button class="modal-btn modal-btn-primary" onclick="copyReport()">📋 Copy</button>' +
+    '<button class="modal-btn modal-btn-secondary" onclick="emailReport()">✉️ Email</button>' +
+    '</div>';
+
+  document.getElementById('modalTitle').textContent = 'Saved! Share Report';
+  document.getElementById('modalSub').textContent = loc + ' · ' + new Date().toLocaleDateString();
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('overlay').classList.add('show');
+
+  currentReportText = text;
+}
+
+var currentReportText = '';
+
+function openSummaryModal() {
+  var r = calcOverall();
+  var loc = document.getElementById('locationName').value || 'Not specified';
+  var aud = document.getElementById('auditorName').value || 'Not specified';
+
+  var html = '<div class="sum-sec"><div class="sum-sec-title">Audit Info</div>' +
+    '<div class="sum-row"><span>Location</span><span>'+loc+'</span></div>' +
+    '<div class="sum-row"><span>Auditor</span><span>'+aud+'</span></div>' +
+    '<div class="sum-row"><span>Overall</span><span class="sum-score '+(r.avg?'s'+Math.round(r.avg):'s0')+'">'+(r.avg?r.avg.toFixed(2)+' / 5.00':'Incomplete')+'</span></div>' +
+    '<div class="sum-row"><span>Items Rated</span><span>'+r.rated+' / '+r.total+'</span></div></div>';
+
+  var flags = [];
+  for (var si=0;si<SECTIONS.length;si++) {
+    var sec=SECTIONS[si];
+    var secTotal=0,secCount=0;
+    for(var ii=0;ii<sec.items.length;ii++) if(scores[sec.items[ii].id]){secTotal+=scores[sec.items[ii].id];secCount++;}
+    var secAvg=secCount?(secTotal/secCount).toFixed(1):'—';
+    html+='<div class="sum-sec"><div class="sum-sec-title">'+sec.icon+' '+sec.title+' — '+secAvg+'</div>';
+    for(var ii=0;ii<sec.items.length;ii++) {
+      var item=sec.items[ii]; var s=scores[item.id]; var n=notesData[item.id];
+      if(s&&s<=2) flags.push(item);
+      html+='<div style="padding:6px 0;border-bottom:1px solid #1e2540;"><div style="display:flex;justify-content:space-between"><span style="font-size:13px">'+item.name+'</span><span class="sum-score '+(s?'s'+s:'s0')+'">'+(s||'—')+'</span></div>'+(n?'<div class="sum-note">📝 '+n+'</div>':'')+'</div>';
+    }
+    html+='</div>';
+  }
+
+  if(flags.length) {
+    html+='<div class="sum-sec"><div class="sum-sec-title" style="color:#ef4444">⚠️ Needs Immediate Attention</div>';
+    for(var f=0;f<flags.length;f++) {
+      html+='<div style="padding:6px 0;border-bottom:1px solid #1e2540;display:flex;justify-content:space-between"><span>'+flags[f].name+'</span><span class="sum-score s'+scores[flags[f].id]+'">'+scores[flags[f].id]+'</span></div>';
+    }
+    html+='</div>';
+  }
+
+  document.getElementById('modalTitle').textContent = 'Live Preview';
+  document.getElementById('modalSub').textContent = 'Save the audit to share it.';
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('overlay').classList.add('show');
+}
+
+function selectShareBox() {
+  var box = document.getElementById('shareBox');
+  if (!box) return;
+  var range = document.createRange();
+  range.selectNodeContents(box);
+  var sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+function copyReport() {
+  if (navigator.clipboard && currentReportText) {
+    navigator.clipboard.writeText(currentReportText).then(function() { showToast(); });
+  } else {
+    selectShareBox();
+    try { document.execCommand('copy'); showToast(); } catch(e) { alert('Please manually select and copy the text above.'); }
+  }
+}
+
+function emailReport() {
+  var loc = currentReportText ? currentReportText.split('\n')[3].replace('Location : ','') : '';
+  var subject = encodeURIComponent('Gameway Audit Report — ' + loc);
+  var body = encodeURIComponent(currentReportText);
+  window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+}
+
+function showToast() {
+  var t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2000);
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('show');
+}
+
+// ── DETAIL VIEW ───────────────────────────
+function viewAudit(idx) {
+  loadSaved();
+  var a = savedAudits[idx];
+  if (!a) return;
+  viewingAuditIndex = idx;
+  currentReportText = buildTextReport(a);
+
+  document.getElementById('detailTitle').textContent = a.location || 'Audit';
+
+  var flags = [];
+  var html = '';
+
+  // Header card
+  var avgClass = a.avg ? 's'+Math.round(a.avg) : 's0';
+  var avgText = a.avg ? a.avg.toFixed(2)+' / 5.00' : '—';
+  html += '<div style="background:#111520;border:1px solid #1e2540;border-radius:10px;padding:14px;margin:0 12px 12px;">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
+      '<div><div style="font-size:13px;color:#64748b;">Location</div><div style="font-weight:500;">'+escHtml(a.location||'—')+'</div></div>' +
+      '<div class="sum-score '+avgClass+'" style="font-size:32px;">'+avgText+'</div>' +
+    '</div>' +
+    '<div style="font-size:12px;color:#64748b;">'+escHtml(a.auditor||'—')+' · '+a.date+'</div>' +
+    '<div style="font-size:12px;color:#64748b;">'+a.rated+' of '+a.total+' items rated</div>' +
+    '</div>';
+
+  for (var si=0;si<SECTIONS.length;si++) {
+    var sec=SECTIONS[si];
+    var secTotal=0,secCount=0;
+    for(var ii=0;ii<sec.items.length;ii++) if(a.scores[sec.items[ii].id]){secTotal+=a.scores[sec.items[ii].id];secCount++;}
+    var secAvg=secCount?(secTotal/secCount).toFixed(1):'—';
+    var secAvgClass=secCount?'s'+Math.round(secTotal/secCount):'s0';
+
+    html+='<div class="detail-sec"><div class="detail-sec-title"><span>'+sec.icon+' '+sec.title+'</span><span class="'+secAvgClass+'">'+secAvg+'</span></div>';
+    for(var ii=0;ii<sec.items.length;ii++) {
+      var item=sec.items[ii];
+      var s=a.scores[item.id];
+      var n=a.notes[item.id];
+      if(s&&s<=2) flags.push({name:item.name,score:s,note:n});
+      html+='<div class="detail-item"><div class="detail-item-row"><span class="detail-item-name">'+item.name+'</span><span class="detail-item-score '+(s?'s'+s:'s0')+'">'+(s||'—')+'</span></div>'+(n?'<div class="detail-note">📝 '+n+'</div>':'')+'</div>';
+    }
+    html+='</div>';
+  }
+
+  if(flags.length) {
+    var flagHtml='<div class="flag-banner"><div class="flag-banner-title">⚠️ Needs Immediate Attention</div>';
+    for(var f=0;f<flags.length;f++) flagHtml+='<div class="flag-item"><span>'+flags[f].name+'</span><span class="s'+flags[f].score+'">'+flags[f].score+'/5</span></div>';
+    flagHtml+='</div>';
+    html = html.replace('<div class="detail-sec">', flagHtml+'<div class="detail-sec">');
+  }
+
+  document.getElementById('detailContent').innerHTML = html;
+  showView('detail');
+}
+
+function shareDetailText() {
+  if (navigator.clipboard && currentReportText) {
+    navigator.clipboard.writeText(currentReportText).then(function(){ showToast(); });
+  } else {
+    var subject = encodeURIComponent('Gameway Audit Report');
+    var body = encodeURIComponent(currentReportText);
+    window.location.href = 'mailto:?subject='+subject+'&body='+body;
+  }
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── INIT ──────────────────────────────────
+loadSaved();
+renderPastAudits();
+</script>
+</body>
+</html>
